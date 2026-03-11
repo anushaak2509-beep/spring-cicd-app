@@ -2,12 +2,14 @@ pipeline {
     agent any
 
     // ─── CONFIGURE THESE VARIABLES ───────────────────────────────────────────
-    environment {
-        APP_NAME       = 'webapp'
-        WAR_FILE       = 'target\\webapp.war'
-        TOMCAT_WEBAPPS = 'C:\\Tomcat10\\webapps'   // ← Change to your Tomcat path
-        TOMCAT_BIN     = 'C:\\Tomcat10\\bin'        // ← Change to your Tomcat bin path
-    }
+environment {
+    APP_NAME       = 'webapp'
+    WAR_FILE       = 'target\\webapp.war'
+    TOMCAT_WEBAPPS = 'C:\\Tomcat10\\webapps'
+    TOMCAT_BIN     = 'C:\\Tomcat10\\bin'
+    JAVA_HOME      = 'C:\\Program Files\\Java\\jdk-17'
+    PATH           = "C:\\Program Files\\Java\\jdk-17\\bin;C:\\apache-maven-3.9.12\\bin;${env.PATH}"
+}
     // ─────────────────────────────────────────────────────────────────────────
 
     tools {

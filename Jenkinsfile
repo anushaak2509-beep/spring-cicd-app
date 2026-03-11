@@ -7,10 +7,9 @@ environment {
     WAR_FILE       = 'target\\webapp.war'
     TOMCAT_WEBAPPS = 'C:\\Tomcat10\\webapps'
     TOMCAT_BIN     = 'C:\\Tomcat10\\bin'
-    JAVA_HOME      = 'C:\\Program Files\\Java\\jdk-17'
-    PATH           = "C:\\Program Files\\Java\\jdk-17\\bin;C:\\apache-maven-3.9.12\\bin;${env.PATH}"
-}
-    // ─────────────────────────────────────────────────────────────────────────
+    JAVA_HOME      = 'C:\\PROGRA~1\\Java\\jdk-17'
+    PATH           = "C:\\PROGRA~1\\Java\\jdk-17\\bin;C:\\apache-maven-3.9.12\\bin;${env.PATH}"
+}    // ─────────────────────────────────────────────────────────────────────────
 
     tools {
         maven 'Maven-3.9'   // Must match Jenkins → Global Tool Configuration

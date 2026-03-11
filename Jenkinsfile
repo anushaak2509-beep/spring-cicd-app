@@ -31,28 +31,28 @@ tools {
             steps {
                 echo '========== Build Environment Info =========='
                 bat 'java -version'
-                bat 'mvn -version'
+                bat 'set JAVA_HOME=C:\\PROGRA~1\\Java\\jdk-17 && C:\\apache-maven-3.9.12\\bin\\mvn.cmd -version'
             }
         }
 
         stage('Clean') {
             steps {
                 echo '========== Cleaning previous build =========='
-                bat 'mvn clean'
+                bat 'set JAVA_HOME=C:\\PROGRA~1\\Java\\jdk-17 && C:\\apache-maven-3.9.12\\bin\\mvn.cmd clean'
             }
         }
 
         stage('Build') {
             steps {
                 echo '========== Building the Spring Boot WAR =========='
-                bat 'mvn compile'
+                bat 'set JAVA_HOME=C:\\PROGRA~1\\Java\\jdk-17 && C:\\apache-maven-3.9.12\\bin\\mvn.cmd compile'
             }
         }
 
         stage('Test') {
             steps {
                 echo '========== Running Unit Tests =========='
-                bat 'mvn test'
+                bat 'set JAVA_HOME=C:\\PROGRA~1\\Java\\jdk-17 && C:\\apache-maven-3.9.12\\bin\\mvn.cmd test'
             }
             post {
                 always {
@@ -68,7 +68,7 @@ tools {
         stage('Package') {
             steps {
                 echo '========== Packaging WAR file =========='
-                bat 'mvn package -DskipTests'
+                bat 'set JAVA_HOME=C:\\PROGRA~1\\Java\\jdk-17 && C:\\apache-maven-3.9.12\\bin\\mvn.cmd package -DskipTests'
                 bat 'dir target\\*.war'
             }
             post {

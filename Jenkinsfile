@@ -11,10 +11,10 @@ environment {
     PATH           = "C:\\PROGRA~1\\Java\\jdk-17\\bin;C:\\apache-maven-3.9.12\\bin;${env.PATH}"
 }    // ─────────────────────────────────────────────────────────────────────────
 
-    tools {
-        maven 'Maven-3.9'   // Must match Jenkins → Global Tool Configuration
-        jdk   'JDK-17'      // Must match Jenkins → Global Tool Configuration
-    }
+tools {
+    maven 'Maven3'
+    jdk   'JDK17'
+}
 
     stages {
 

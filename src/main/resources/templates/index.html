@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Spring Boot CI/CD App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+    <style>
+        :root {
+            --bg: #070A0F;
+            --surface: #0D1117;
+            --border: rgba(255,255,255,0.06);
+            --accent: #00FF88;
+            --accent2: #0066FF;
+            --text: #E8EDF3;
+            --muted: #4A5568;
+            --glow: rgba(0, 255, 136, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Syne', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Radial glow */
+        body::after {
+            content: '';
+            position: fixed;
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 500px;
+            background: radial-gradient(ellipse, rgba(0,102,255,0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 24px 60px;
+        }
+
+        /* ── HEADER ── */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 60px;
+            animation: fadeDown 0.6s ease both;
+        }
+
+        .logo {
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,255,136,0.08);
+            border: 1px solid rgba(0,255,136,0.2);
+            border-radius: 100px;
+            padding: 6px 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent);
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            margin-bottom: 48px;
+            animation: fadeUp 0.7s 0.1s ease both;
+        }
+
+        .hero-eyebrow {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.4rem, 6vw, 4rem);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -1px;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-message {
+            font-size: 1.1rem;
+            color: #8899AA;
+            font-weight: 400;
+            max-width: 520px;
+            line-height: 1.6;
+        }
+
+        /* ── STATS ROW ── */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 32px;
+            animation: fadeUp 0.7s 0.2s ease both;
+        }
+
+        .stat {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s, transform 0.3s;
+        }
+
+        .stat:hover {
+            border-color: rgba(0,255,136,0.2);
+            transform: translateY(-2px);
+        }
+
+        .stat::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent2), var(--accent));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .stat:hover::before { opacity: 1; }
+
+        .stat-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .stat-value.green { color: var(--accent); }
+        .stat-value.blue { color: #60A5FA; }
+
+        /* ── MAIN CARD ── */
+        .main-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            animation: fadeUp 0.7s 0.3s ease both;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--muted);
+        }
+
+        .version-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            background: rgba(0,102,255,0.12);
+            border: 1px solid rgba(0,102,255,0.25);
+            color: #60A5FA;
+            padding: 3px 10px;
+            border-radius: 6px;
+        }
+
+        /* ── PIPELINE ── */
+        .pipeline {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .pipe-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 80px;
+        }
+
+        .pipe-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            background: rgba(0,255,136,0.08);
+            border: 1px solid rgba(0,255,136,0.2);
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .pipe-icon:hover { transform: scale(1.1); }
+
+        .pipe-icon::after {
+            content: '✓';
+            position: absolute;
+            top: -5px; right: -5px;
+            width: 14px; height: 14px;
+            background: var(--accent);
+            color: #000;
+            border-radius: 50%;
+            font-size: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+        }
+
+        .pipe-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .pipe-arrow {
+            color: var(--muted);
+            font-size: 0.8rem;
+            margin: 0 4px;
+            padding-bottom: 20px;
+            flex-shrink: 0;
+        }
+
+        /* ── INFO GRID ── */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+            animation: fadeUp 0.7s 0.4s ease both;
+        }
+
+        .info-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .info-card h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--muted);
+            margin-bottom: 14px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+
+        .info-row:last-child { border-bottom: none; }
+        .info-row .key { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
+        .info-row .val { color: var(--text); font-weight: 600; }
+        .info-row .val.accent { color: var(--accent); }
+
+        /* ── TIMESTAMP ── */
+        .timestamp-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: fadeUp 0.7s 0.5s ease both;
+        }
+
+        .ts-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--muted);
+        }
+
+        .ts-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            text-align: center;
+            margin-top: 48px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--muted);
+            letter-spacing: 1px;
+            animation: fadeUp 0.7s 0.6s ease both;
+        }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,255,136,0.4); }
+            50%       { opacity: 0.7; box-shadow: 0 0 0 6px rgba(0,255,136,0); }
+        }
+
+        @media (max-width: 600px) {
+            .stats { grid-template-columns: 1fr; }
+            .info-grid { grid-template-columns: 1fr; }
+            .pipeline { justify-content: flex-start; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo">Spring // CI·CD</div>
+        <div class="status-pill">
+            <div class="dot"></div>
+            DEPLOYED
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-eyebrow">// deployment successful</div>
+        <h1>Spring Boot<br/><span>Web Application</span></h1>
+        <p class="hero-message" th:text="${message}">Hello from Spring Boot CI/CD Pipeline!</p>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-label">Version</div>
+            <div class="stat-value green" th:text="${version}">v1.0.0</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Status</div>
+            <div class="stat-value green">RUNNING</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Server Port</div>
+            <div class="stat-value blue">:8085</div>
+        </div>
+    </div>
+
+    <!-- PIPELINE STAGES -->
+    <div class="main-card">
+        <div class="card-header">
+            <div class="card-title">// pipeline stages</div>
+            <div class="version-badge">BUILD PASSED</div>
+        </div>
+        <div class="pipeline">
+            <div class="pipe-step">
+                <div class="pipe-icon">📥</div>
+                <div class="pipe-label">Checkout</div>
+            </div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-step">
+                <div class="pipe-icon">🔨</div>
+                <div class="pipe-label">Build</div>
+            </div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-step">
+                <div class="pipe-icon">🧪</div>
+                <div class="pipe-label">Test</div>
+            </div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-step">
+                <div class="pipe-icon">📦</div>
+                <div class="pipe-label">Package</div>
+            </div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-step">
+                <div class="pipe-icon">🚀</div>
+                <div class="pipe-label">Deploy</div>
+            </div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-step">
+                <div class="pipe-icon">✅</div>
+                <div class="pipe-label">Live</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INFO GRID -->
+    <div class="info-grid">
+        <div class="info-card">
+            <h3>// stack</h3>
+            <div class="info-row">
+                <span class="key">Framework</span>
+                <span class="val">Spring Boot 3.2</span>
+            </div>
+            <div class="info-row">
+                <span class="key">Java</span>
+                <span class="val">JDK 17</span>
+            </div>
+            <div class="info-row">
+                <span class="key">Build</span>
+                <span class="val">Maven 3.9</span>
+            </div>
+            <div class="info-row">
+                <span class="key">Packaging</span>
+                <span class="val accent">WAR</span>
+            </div>
+        </div>
+        <div class="info-card">
+            <h3>// infrastructure</h3>
+            <div class="info-row">
+                <span class="key">SCM</span>
+                <span class="val">GitHub</span>
+            </div>
+            <div class="info-row">
+                <span class="key">CI/CD</span>
+                <span class="val">Jenkins :8080</span>
+            </div>
+            <div class="info-row">
+                <span class="key">Server</span>
+                <span class="val">Tomcat :8085</span>
+            </div>
+            <div class="info-row">
+                <span class="key">Trigger</span>
+                <span class="val accent">Auto Push</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- TIMESTAMP -->
+    <div class="timestamp-bar">
+        <div class="ts-label">// last deployed</div>
+        <div class="ts-value" th:text="${timestamp}">2026-03-11 12:00:00</div>
+    </div>
+
+    <footer>
+        SPRING BOOT · JENKINS · TOMCAT · GITHUB — CI/CD PIPELINE
+    </footer>
+
+</div>
+</body>
+</html>
